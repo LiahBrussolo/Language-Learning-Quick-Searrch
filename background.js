@@ -136,7 +136,9 @@ async function handleSearch(query, srcUrl) {
 
   const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const windowId = currentTab?.windowId;
-  const existingTabs = reuseTabs ? await chrome.tabs.query({ windowId }) : [];
+  // Look across EVERY Chrome window (covers multi-monitor / multi-window setups),
+  // not just the current one.
+  const existingTabs = reuseTabs ? await chrome.tabs.query({}) : [];
 
   let firstActivated = false;
 
@@ -147,7 +149,7 @@ async function handleSearch(query, srcUrl) {
       ? site.url.replace(/\{query\}/g, encodeURIComponent(query))
       : site.url;
 
-    // Reuse an existing tab on the same origin
+    // Reuse an existing tab on the same origin — in any open window
     if (reuseTabs) {
       const origin = new URL(isTemplate ? targetUrl : site.url).origin;
       const match  = existingTabs.find(t => {
@@ -155,15 +157,18 @@ async function handleSearch(query, srcUrl) {
         catch { return false; }
       });
       if (match) {
-        if (!firstActivated) await chrome.tabs.update(match.id, { active: true });
-        firstActivated = true;
         if (!isTemplate) await chrome.storage.session.set({ [`qs_${match.id}`]: query });
-        await chrome.tabs.update(match.id, { url: targetUrl });
+        await chrome.tabs.update(match.id, { url: targetUrl, active: true });
+        // Bring that tab's window forward (it may be on another monitor)
+        if (!firstActivated && match.windowId != null) {
+          await chrome.windows.update(match.windowId, { focused: true });
+        }
+        firstActivated = true;
         continue;
       }
     }
 
-    // Open new tab
+    // Open new tab in the window the search was triggered from
     const tab = await chrome.tabs.create({ url: targetUrl, active: !firstActivated, windowId });
     firstActivated = true;
     if (!isTemplate) await chrome.storage.session.set({ [`qs_${tab.id}`]: query });
