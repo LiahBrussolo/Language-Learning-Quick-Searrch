@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "QuickSearch",
+  "name": "Multi-Search",
   "version": "1.0.0",
   "description": "Select text to instantly search on your favorite websites",
   "permissions": ["storage", "tabs", "scripting", "contextMenus", "clipboardWrite", "offscreen"],

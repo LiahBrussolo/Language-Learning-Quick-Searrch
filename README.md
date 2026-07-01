@@ -12,5 +12,5 @@ Example: If I select a word and have 2 websites -- for instance, a dictionary an
 - It's easy to add and exclude websites, possible to make changes while on the website of interest
 
 ### For PDFs & non-scriptable pages
-1. Right-click selected text and click Search with QuickSearch
+1. Right-click selected text and click Search with Multi-Search
 2. Select text, then press Ctrl+Shift+F

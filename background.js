@@ -54,7 +54,7 @@ async function readFromClipboard() {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id:       'qs-search',
-    title:    'Search with QuickSearch',
+    title:    'Search with Multi-Search',
     contexts: ['selection'],
   });
 });
